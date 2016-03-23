@@ -9,9 +9,15 @@ const PATHS = {
     build: path.join(__dirname, 'build')
 };
 
+process.env.BABEL_ENV = TARGET;
+
 const common = {
     entry: {
         app: PATHS.app
+    },
+    //Add resolve.extensions
+    resolve: {
+        extensions: ['', '.js', '.jsx']
     },
     output: {
         path: PATHS.build,
@@ -26,6 +32,12 @@ const common = {
               //Either path or an array of paths
               //If not set webpack will traverse
               //all directories start from base
+              include: PATHS.app
+          },
+          //Thanks to regular expression it accepts .js
+          {
+              test: /\.jsx?$/,
+              loaders: ['babel?cacheDirectory'],
               include: PATHS.app
           }
         ]
