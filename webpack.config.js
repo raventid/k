@@ -1,6 +1,7 @@
 const path = require('path');
 const merge = require('webpack-merge');
-const webpack = require('webpack')
+const webpack = require('webpack');
+const NpmInstallPlugin = require('npm-install-webpack-plugin');//install webpack plugins and changes config
 
 const TARGET = process.env.npm_lifecycle_event;
 const PATHS = {
@@ -15,12 +16,26 @@ const common = {
     output: {
         path: PATHS.build,
         filename: 'bundle.js'
+    },
+    module: {
+        loaders: [
+          {
+              //Test expects a RegExp!
+              test: /\.css$/,
+              loaders: ['style', 'css'],
+              //Either path or an array of paths
+              //If not set webpack will traverse
+              //all directories start from base
+              include: PATHS.app
+          }
+        ]
     }
 };
 
 //Default conf
 if(TARGET === 'start' || !TARGET){
     module.exports = merge(common, {
+        devtool: 'eval-source-map',
         devServer: {
             contentBase: PATHS.build,
 
@@ -41,7 +56,10 @@ if(TARGET === 'start' || !TARGET){
             port: process.env.PORT
         },
         plugins: [
-            new webpack.HotModuleReplacementPlugin()
+            new webpack.HotModuleReplacementPlugin(),
+            new NpmInstallPlugin({
+                save: true // --save
+            })
         ]
     });
 }

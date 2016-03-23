@@ -11,6 +11,9 @@
   "author": "raventid",
   "license": "MIT",
   "devDependencies": {
+    "css-loader": "^0.23.1",
+    "npm-install-webpack-plugin": "^3.0.0",
+    "style-loader": "^0.13.0",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",
     "webpack-merge": "^0.8.4"
