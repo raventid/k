@@ -5,4 +5,3 @@ const alt = new Alt();
 //chromeDebug(alt);
 
 export default alt;
-

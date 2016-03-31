@@ -26,6 +26,8 @@ class LaneStore {
 
       return lane;
     });
+
+    this.setState({lanes});
   }
   delete(id) {
     this.setState({
@@ -37,7 +39,8 @@ class LaneStore {
       if(lane.id === laneId) {
         if(lane.notes.includes(noteId)) {
           console.warn('Already attached note to lane', lanes);
-        } else {
+        }
+        else {
           lane.notes.push(noteId);
         }
       }

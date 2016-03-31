@@ -6,9 +6,8 @@ export default class Editable extends React.Component {
 
     return (
       <div {...props}>
-        {console.log('Editable RETURNS THE: ' + editing)}
-        {editing ? this.renderEdit() : this.renderValue()} 
-      </div> 
+        {editing ? this.renderEdit() : this.renderValue()}
+      </div>
     );
   }
   renderEdit = () => {
@@ -24,25 +23,17 @@ export default class Editable extends React.Component {
   renderValue = () => {
     const onDelete = this.props.onDelete;
 
-    console.log(this);
-    console.log(this.props.value);
-    console.log(this.props.task);
     return (
       <div onClick={this.props.onValueClick}>
-        <span className="value">
-          {this.props.value}
-        </span>
-        {onDelete ? this.renderDelete() : null}
+        <span className="value">{this.props.value}</span>
+        {onDelete ? this.renderDelete() : null }
       </div>
     );
   };
   renderDelete = () => {
     return <button
       className="delete"
-      onClick={this.props.onDelete}
-    >
-      delete 
-    </button>
+      onClick={this.props.onDelete}>x</button>;
   };
   checkEnter = (e) => {
     if(e.key === 'Enter') {
