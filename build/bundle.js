@@ -113,7 +113,7 @@
 
 
 	// module
-	exports.push([module.id, "body {\n  background: #026aa7;\n  color: #595959;\n  font-family: sans-serif;\n}\n\n.add-note {\n  background-color: #fdfdfd;\n  border: 1px solid #ccc;\n}\n\n.notes {\n  margin: 0.5em;\n  padding-left: 0;\n\n  max-width: 10em;\n  list-style: none;\n}\n\n.note {\n  margin-bottom: 0.5em;\n  padding: 0.5em;\n\n  background-color: #fdfdfd;\n  box-shadow: 0 0 0.3em 0.03em rgba(0, 0, 0, 0.3);\n}\n\n.note:hover {\n  box-shadow: 0 0 0.3em 0.03em rgba(0, 0, 0, 0.7);\n\n  transition: 0.6s;\n}\n\n.note .task {\n  display: inline-block;\n}\n\n.note .delete-note {\n  float: right;\n\n  padding: 0;\n\n  background-color: #fdfdfd;\n  border: none;\n\n  cursor: pointer;\n\n  visibility: hidden;\n}\n\n.note:hover .delete-note {\n  visibility: visible;\n}\n", ""]);
+	exports.push([module.id, "body {\n  background: #026aa7;\n  color: #595959;\n  font-family: sans-serif;\n}\n\n.add-note {\n  background-color: #fdfdfd;\n  border: 1px solid #ccc;\n}\n\n.notes {\n  margin: 0.5em;\n  padding-left: 0;\n\n  max-width: 10em;\n  list-style: none;\n}\n\n.note {\n  margin-bottom: 0.5em;\n  padding: 0.5em;\n\n  background-color: #fdfdfd;\n  box-shadow: 0 0 0.3em 0.03em rgba(0, 0, 0, 0.3);\n}\n\n.note:hover {\n  box-shadow: 0 0 0.3em 0.03em rgba(0, 0, 0, 0.7);\n\n  transition: 0.6s;\n}\n\n.note .value {\n  display: inline-block;\n}\n\n.note .delete {\n  float: right;\n\n  padding: 0;\n\n  background-color: #fdfdfd;\n  border: none;\n\n  cursor: pointer;\n\n  visibility: hidden;\n}\n\n.note:hover .delete {\n  visibility: visible;\n}\n", ""]);
 
 	// exports
 
@@ -20095,16 +20095,19 @@
 	            className: 'add-lane',
 	            onClick: this.addLane
 	          },
-	          '+'
+	          'Add lane'
 	        ),
-	        _react2.default.createElement(_altContainer2.default, {
-	          stores: [_LaneStore2.default],
-	          inject: {
-	            lanes: function lanes() {
-	              return _LaneStore2.default.getState().lanes || [];
-	            }
-	          } }),
-	        _react2.default.createElement(_Lanes2.default, null)
+	        _react2.default.createElement(
+	          _altContainer2.default,
+	          {
+	            stores: [_LaneStore2.default],
+	            inject: {
+	              lanes: function lanes() {
+	                return _LaneStore2.default.getState().lanes || [];
+	              }
+	            } },
+	          _react2.default.createElement(_Lanes2.default, null)
+	        )
 	      );
 	    }
 	  }, {
@@ -24983,7 +24986,10 @@
 	    'div',
 	    { className: 'lanes' },
 	    lanes.map(function (lane) {
-	      return _react2.default.createElement(_Lane2.default, { className: 'lane', key: lane.id, lane: lane });
+	      return _react2.default.createElement(_Lane2.default, {
+	        className: 'lane',
+	        key: lane.id,
+	        lane: lane });
 	    })
 	  );
 	};
@@ -25021,6 +25027,14 @@
 
 	var _NoteStore2 = _interopRequireDefault(_NoteStore);
 
+	var _LaneActions = __webpack_require__(219);
+
+	var _LaneActions2 = _interopRequireDefault(_LaneActions);
+
+	var _Editable = __webpack_require__(202);
+
+	var _Editable2 = _interopRequireDefault(_Editable);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -25035,9 +25049,51 @@
 	  _inherits(Lane, _React$Component);
 
 	  function Lane() {
+	    var _Object$getPrototypeO;
+
+	    var _temp, _this, _ret;
+
 	    _classCallCheck(this, Lane);
 
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Lane).apply(this, arguments));
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Lane)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.addNote = function (e) {
+	      // if note is added, avoid opening lane name
+	      // edit by stopping event bubbling in this case.
+
+	      e.stopPropagation();
+
+	      var laneId = _this.props.lane.id;
+	      var note = _NoteActions2.default.create({ task: 'New task' });
+
+	      _LaneActions2.default.attachToLane({
+	        noteId: note.id,
+	        laneId: laneId
+	      });
+	    }, _this.deleteNote = function (noteId, e) {
+	      e.stopPropagation();
+
+	      var laneId = _this.props.lane.id;
+
+	      _LaneActions2.default.detachFromLane({ laneId: laneId, noteId: noteId });
+	      _NoteActions2.default.delete(noteId);
+	    }, _this.editName = function (name) {
+	      var laneId = _this.props.lane.id;
+
+	      console.log('edit lane ' + laneId + ' name using ' + name);
+	    }, _this.deleteLane = function () {
+	      var laneId = _this.props.lane.id;
+
+	      console.log('delete lane ' + laneId);
+	    }, _this.activateLaneEdit = function () {
+	      var laneId = _this.props.lane.id;
+
+	      console.log('activate lane ' + laneId + ' edit');
+	    }, _this.activateNoteEdit = function (id) {
+	      console.log('activate note ' + id + ' edit');
+	    }, _temp), _possibleConstructorReturn(_this, _ret);
 	  }
 
 	  _createClass(Lane, [{
@@ -25053,30 +25109,44 @@
 	        props,
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'lane-header' },
+	          { className: 'lane-header', onClick: this.activateLaneEdit },
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'lane-add-note' },
 	            _react2.default.createElement(
 	              'button',
 	              { onClick: this.addNote },
-	              '+'
+	              'Add note'
 	            )
 	          ),
+	          _react2.default.createElement(_Editable2.default, { className: 'lane-name', editing: lane.editing, value: lane.name, onEdit: this.editName }),
+	          lane.name,
 	          _react2.default.createElement(
 	            'div',
-	            { className: 'lane-name' },
-	            lane.name
+	            { className: 'lane-delete' },
+	            _react2.default.createElement(
+	              'button',
+	              { onClick: this.deleteLane },
+	              'Delete'
+	            )
 	          )
 	        ),
-	        _react2.default.createElement(_altContainer2.default, {
-	          stores: [_NoteStore2.default],
-	          inject: {
-	            notes: function notes() {
-	              return _NoteStore2.default.getState().notes || [];
+	        _react2.default.createElement(
+	          _altContainer2.default,
+	          {
+	            stores: [_NoteStore2.default],
+	            inject: {
+	              notes: function notes() {
+	                return _NoteStore2.default.getNotesByIds(lane.notes);
+	              }
 	            }
-	          }
-	        })
+	          },
+	          _react2.default.createElement(_Notes2.default, {
+	            onValueClick: this.activateNoteEdit,
+	            onEdit: this.editNote,
+	            onDelete: this.deleteNote
+	          })
+	        )
 	      );
 	    }
 	  }, {
@@ -25087,18 +25157,6 @@
 	      }
 
 	      _NoteActions2.default.update({ id: id, task: task });
-	    }
-	  }, {
-	    key: 'addNote',
-	    value: function addNote() {
-	      _NoteActions2.default.create({ task: 'New task' });
-	    }
-	  }, {
-	    key: 'deleteNote',
-	    value: function deleteNote(id, e) {
-	      e.stopPropagation();
-
-	      _NoteActions2.default.delete(id);
 	    }
 	  }]);
 
@@ -25121,14 +25179,15 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _Note = __webpack_require__(202);
+	var _Editable = __webpack_require__(202);
 
-	var _Note2 = _interopRequireDefault(_Note);
+	var _Editable2 = _interopRequireDefault(_Editable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	exports.default = function (_ref) {
 	  var notes = _ref.notes;
+	  var onValueClick = _ref.onValueClick;
 	  var onEdit = _ref.onEdit;
 	  var onDelete = _ref.onDelete;
 
@@ -25139,8 +25198,10 @@
 	      return _react2.default.createElement(
 	        'li',
 	        { className: 'note', key: note.id },
-	        _react2.default.createElement(_Note2.default, {
+	        _react2.default.createElement(_Editable2.default, {
+	          editing: note.editing,
 	          task: note.task,
+	          onValueClick: onValueClick.bind(null, note.id),
 	          onEdit: onEdit.bind(null, note.id),
 	          onDelete: onDelete.bind(null, note.id) })
 	      );
@@ -25167,102 +25228,102 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Note = function (_React$Component) {
-	  _inherits(Note, _React$Component);
+	var Editable = function (_React$Component) {
+	  _inherits(Editable, _React$Component);
 
-	  function Note(props) {
-	    _classCallCheck(this, Note);
+	  function Editable() {
+	    var _Object$getPrototypeO;
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Note).call(this, props));
+	    var _temp, _this, _ret;
 
-	    _this.renderEdit = function () {
+	    _classCallCheck(this, Editable);
+
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Editable)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.renderEdit = function () {
 	      return _react2.default.createElement("input", { type: "text",
 	        ref: function ref(e) {
-	          return e ? e.selectionStart = _this.props.task.length : null;
+	          return e ? e.selectionStart = _this.props.value.length : null;
 	        },
 	        autoFocus: true,
-	        defaultValue: _this.props.task,
+	        defaultValue: _this.props.value,
 	        onBlur: _this.finishEdit,
 	        onKeyPress: _this.checkEnter });
-	    };
-
-	    _this.renderNote = function () {
+	    }, _this.renderValue = function () {
 	      var onDelete = _this.props.onDelete;
 
+	      console.log(_this);
+	      console.log(_this.props.value);
+	      console.log(_this.props.task);
 	      return _react2.default.createElement(
 	        "div",
-	        { onClick: _this.edit },
+	        { onClick: _this.props.onValueClick },
 	        _react2.default.createElement(
 	          "span",
-	          { className: "task" },
-	          _this.props.task
+	          { className: "value" },
+	          _this.props.value
 	        ),
 	        onDelete ? _this.renderDelete() : null
 	      );
-	    };
-
-	    _this.edit = function () {
+	    }, _this.renderDelete = function () {
+	      return _react2.default.createElement(
+	        "button",
+	        {
+	          className: "delete",
+	          onClick: _this.props.onDelete
+	        },
+	        "delete"
+	      );
+	    }, _this.edit = function () {
 	      _this.setState({
 	        editing: true
 	      });
-	    };
-
-	    _this.checkEnter = function (e) {
+	    }, _this.checkEnter = function (e) {
 	      if (e.key === 'Enter') {
 	        _this.finishEdit(e);
 	      }
-	    };
-
-	    _this.finishEdit = function (e) {
+	    }, _this.finishEdit = function (e) {
 	      var value = e.target.value;
 
 	      if (_this.props.onEdit) {
 	        _this.props.onEdit(value);
-
-	        /*exit edit mode*/
-	        _this.setState({
-	          editing: false
-	        });
 	      }
-	    };
-
-	    _this.renderDelete = function () {
-	      return _react2.default.createElement(
-	        "button",
-	        {
-	          className: "delete-note",
-	          onClick: _this.props.onDelete },
-	        "Delete"
-	      );
-	    };
-
-	    _this.state = {
-	      editing: false
-	    };
-	    return _this;
+	    }, _temp), _possibleConstructorReturn(_this, _ret);
 	  }
 
-	  _createClass(Note, [{
+	  _createClass(Editable, [{
 	    key: "render",
 	    value: function render() {
-	      if (this.state.editing) {
-	        return this.renderEdit();
-	      }
+	      var _props = this.props;
+	      var value = _props.value;
+	      var onEdit = _props.onEdit;
+	      var onValueClick = _props.onValueClick;
+	      var editing = _props.editing;
 
-	      return this.renderNote();
+	      var props = _objectWithoutProperties(_props, ["value", "onEdit", "onValueClick", "editing"]);
+
+	      return _react2.default.createElement(
+	        "div",
+	        props,
+	        editing ? this.renderEdit() : this.renderValue()
+	      );
 	    }
 	  }]);
 
-	  return Note;
+	  return Editable;
 	}(_react2.default.Component);
 
-	exports.default = Note;
+	exports.default = Editable;
 
 /***/ },
 /* 203 */
@@ -27031,6 +27092,10 @@
 	    this.bindActions(_NoteActions2.default);
 
 	    this.notes = [];
+
+	    this.exportPublicMethods({
+	      getNotesByIds: this.getNotesByIds.bind(this)
+	    });
 	  }
 
 	  _createClass(NoteStore, [{
@@ -27043,6 +27108,8 @@
 	      this.setState({
 	        notes: notes.concat(note)
 	      });
+
+	      return note;
 	    }
 	  }, {
 	    key: 'update',
@@ -27068,6 +27135,21 @@
 	        })
 	      });
 	    }
+	  }, {
+	    key: 'getNotesByIds',
+	    value: function getNotesByIds(ids) {
+	      var _this = this;
+
+	      return (ids || []).map(function (id) {
+	        return _this.notes.filter(function (note) {
+	          return note.id === id;
+	        });
+	      }).filter(function (a) {
+	        return a.length;
+	      }).map(function (a) {
+	        return a[0];
+	      });
+	    }
 	  }]);
 
 	  return NoteStore;
@@ -27091,7 +27173,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	exports.default = _alt2.default.generateActions('create');
+	exports.default = _alt2.default.generateActions('create', 'attachToLane', 'detachFromLane');
 
 /***/ },
 /* 220 */
@@ -27127,7 +27209,7 @@
 
 	    this.bindActions(_LaneActions2.default);
 
-	    this.lane = [];
+	    this.lanes = [];
 	  }
 
 	  _createClass(LaneStore, [{
@@ -27141,6 +27223,44 @@
 	      this.setState({
 	        lanes: lanes.concat(lane)
 	      });
+	    }
+	  }, {
+	    key: 'attachToLane',
+	    value: function attachToLane(_ref) {
+	      var laneId = _ref.laneId;
+	      var noteId = _ref.noteId;
+
+	      var lanes = this.lanes.map(function (lane) {
+	        if (lane.id === laneId) {
+	          if (lane.notes.indexOf(noteId) !== -1) {
+	            console.warn('Already attached note to lane', lanes);
+	          } else {
+	            lane.notes.push(noteId);
+	          }
+	        }
+
+	        return lane;
+	      });
+
+	      this.setState({ lanes: lanes });
+	    }
+	  }, {
+	    key: 'detachFromLane',
+	    value: function detachFromLane(_ref2) {
+	      var laneId = _ref2.laneId;
+	      var noteId = _ref2.noteId;
+
+	      var lanes = this.lanes.map(function (lane) {
+	        if (lane.id === laneId) {
+	          lane.notes = lane.notes.filter(function (note) {
+	            return note !== noteId;
+	          });
+	        }
+
+	        return lane;
+	      });
+
+	      this.setState({ lanes: lanes });
 	    }
 	  }]);
 

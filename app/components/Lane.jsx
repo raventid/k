@@ -3,6 +3,8 @@ import React from 'react';
 import Notes from './Notes.jsx';
 import NoteActions from '../actions/NoteActions';
 import NoteStore from '../stores/NoteStore';
+import LaneActions from '../actions/LaneActions';
+import Editable from './Editable.jsx';
 
 export default class Lane extends React.Component {
   render () {
@@ -10,23 +12,26 @@ export default class Lane extends React.Component {
 
     return (
       <div {...props}>
-        <div className="lane-header">
+        <div className="lane-header" onClick={this.activateLaneEdit}>
           <div className="lane-add-note">
             <button onClick={this.addNote}>
               Add note 
             </button>
           </div>
-          <div className="lane-name">
-            {lane.name}
+          <Editable className="lane-name" editing={lane.editing} value={lane.name} onEdit={this.editName} />
+          {lane.name}
+          <div className="lane-delete">
+            <button onClick={this.deleteLane}>Delete lane</button>
           </div>
         </div>
         <AltContainer
           stores={[NoteStore]}
           inject={{
-            notes: () => NoteStore.getState().notes || []
+            notes: () => NoteStore.getNotesByIds(lane.notes)
           }}
         >
           <Notes
+            onValueClick={this.activateNoteEdit}
             onEdit={this.editNote}
             onDelete={this.deleteNote}
           />
@@ -41,12 +46,44 @@ export default class Lane extends React.Component {
 
     NoteActions.update({id, task});
   }
-  addNote() {
-    NoteActions.create({task: 'New task'});
-  }
-  deleteNote(id, e) {
+  addNote = (e) => {
+    // if note is added, avoid opening lane name
+    // edit by stopping event bubbling in this case.
+
     e.stopPropagation();
 
-    NoteActions.delete(id);
-  }
+    const laneId = this.props.lane.id;
+    const note = NoteActions.create({task: 'New task'});
+
+    LaneActions.attachToLane({
+      noteId: note.id,
+      laneId
+    });
+  };
+  deleteNote = (noteId, e) => {
+    e.stopPropagation();
+
+    const laneId = this.props.lane.id;
+
+    LaneActions.detachFromLane({laneId, noteId});
+    NoteActions.delete(noteId);
+  };
+  editName = (name) => {
+    const laneId = this.props.lane.id;
+
+    console.log(`edit lane ${laneId} name using ${name}`);
+  };
+  deleteLane = () => {
+    const laneId = this.props.lane.id;
+
+    console.log(`delete lane ${laneId}`);
+  };
+  activateLaneEdit = () => {
+    const laneId = this.props.lane.id;
+
+    console.log(`activate lane ${laneId} edit`);
+  };
+  activateNoteEdit = (id) => {
+    console.log(`activate note ${id} edit`);
+  };
 }

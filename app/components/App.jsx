@@ -13,7 +13,7 @@ export default class App extends React.Component {
             className="add-lane" 
             onClick={this.addLane}
           >
-            +
+           Add lane 
           </button>
 
           <AltContainer
