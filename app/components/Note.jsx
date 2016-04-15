@@ -46,9 +46,11 @@ export default class Note extends React.Component {
     };
   }
   render() {
-    const {connectDragSource, connectDropTarget, isDragging, id, onMove, ...props} = this.props;
+    const {connectDragSource, connectDropTarget, isDragging, id, onMove, editing, ...props} = this.props;
 
-    return connectDragSource(connectDropTarget(<li style={{opacity: isDragging ? 0 : 1}} {...this.props}>{this.props.children}</li>));
+    const dragSource = editing ? a => a : connectDragSource;
+
+    return dragSource(connectDropTarget(<li style={{opacity: isDragging ? 0 : 1}} {...this.props}>{this.props.children}</li>));
   }
   renderEdit = () => {
     return <input type="text"
